@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Italian Brain Rot - NFT Platform</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(1deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 1400px;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    .header {
+      margin-bottom: 3rem;
+    }
+
+    .title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s ease infinite;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 2rem;
+    }
+
+    /* 가로 배치된 메뉴 */
+    .menu-container {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .menu-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      flex: 1;
+      min-width: 320px;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .menu-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .menu-card:hover::before {
+      left: 100%;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .card-content {
+      flex-grow: 1;
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      animation: pulse 2s infinite;
+      position: relative;
+    }
+
+    .card-icon.token-math {
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+    }
+
+    .card-icon.mint-start {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    }
+
+    .card-icon.join-mint {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .card-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .card-description {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .card-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .card-features li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .card-features li::before {
+      content: '✨';
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .card-button {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 1.1rem;
+      position: relative;
+      overflow: hidden;
+      margin-top: auto;
+    }
+
+    .card-button.token-math-btn {
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+    }
+
+    .card-button.mint-start-btn {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    }
+
+    .card-button.join-mint-btn {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    }
+
+    .card-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .card-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .card-button:hover::before {
+      left: 100%;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      margin-top: 4rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    .stats-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      color: white;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      opacity: 0.8;
+      font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .menu-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .menu-card {
+        max-width: 500px;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5rem;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+      
+      .menu-card {
+        min-width: 280px;
+        padding: 2rem 1.5rem;
+      }
+      
+      .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .card-title {
+        font-size: 1.5rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Floating particles */
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: floatUp 6s infinite linear;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(100vh) scale(0);
+      }
+      10% {
+        opacity: 1;
+        transform: translateY(90vh) scale(1);
+      }
+      90% {
+        opacity: 1;
+        transform: translateY(10vh) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(0vh) scale(0);
+      }
+    }
+
+    /* Loading animation for buttons */
+    .loading {
+      position: relative;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Italian Brain Rot</h1>
+      <p class="subtitle">🚀 Next-Generation NFT Platform</p>
+    </div>
+
+    <!-- 가로로 배치된 메뉴 카드들 -->
+    <div class="menu-container">
+      <a href="tokenmath.html" class="menu-card">
+        <div class="card-content">
+          <div class="card-icon token-math">🧮</div>
+          <h3 class="card-title">De-Fi</h3>
+          <p class="card-description">Advanced DeFi operations with multi-token support and real-time analytics</p>
+          <ul class="card-features">
+            <li>Multi-Token Transfer & Swap</li>
+            <li>Yield Staking & Rewards</li>
+            <li>Real-time Balance Updates</li>
+            <li>Advanced DeFi Analytics</li>
+          </ul>
+        </div>
+        <button class="card-button token-math-btn">
+          🚀 Enter DeFi Hub
+        </button>
+      </a>
+
+      <a href="mintstart.html" class="menu-card">
+        <div class="card-content">
+          <div class="card-icon mint-start">🎨</div>
+          <h3 class="card-title">Start Minting</h3>
+          <p class="card-description">Create and launch your own NFT collections with professional tools</p>
+          <ul class="card-features">
+            <li>Drag & Drop Image Upload</li>
+            <li>Rich Metadata Creation</li>
+            <li>Smart Contract Deployment</li>
+            <li>Royalty Configuration</li>
+          </ul>
+        </div>
+        <button class="card-button mint-start-btn">
+          ✨ Create NFT
+        </button>
+      </a>
+
+      <a href="minting.html" class="menu-card">
+        <div class="card-content">
+          <div class="card-icon join-mint">⚡</div>
+          <h3 class="card-title">Join Minting</h3>
+          <p class="card-description">Participate in live community minting events and support creators</p>
+          <ul class="card-features">
+            <li>Live Minting Events</li>
+            <li>Community Funding Pools</li>
+            <li>Real-time Progress Tracking</li>
+            <li>Exclusive Early Access</li>
+          </ul>
+        </div>
+        <button class="card-button join-mint-btn">
+          🌟 Join Community
+        </button>
+      </a>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <h3 class="stats-title">🏆 Platform Statistics</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">12,847</div>
+          <div class="stat-label">NFTs Minted</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3,291</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">847 ETH</div>
+          <div class="stat-label">Total Volume</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98.7%</div>
+          <div class="stat-label">Success Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Create floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + 'vw';
+      particle.style.width = particle.style.height = Math.random() * 10 + 5 + 'px';
+      particle.style.animationDelay = Math.random() * 6 + 's';
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 6000);
+    }
+
+    // Create particles periodically
+    setInterval(createParticle, 300);
+
+    // Add click animation to buttons
+    document.querySelectorAll('.card-button').forEach(button => {
+      button.addEventListener('click', function(e) {
+        // Prevent default link behavior temporarily
+        e.preventDefault();
+        
+        // Add loading animation
+        this.classList.add('loading');
+        this.style.pointerEvents = 'none';
+        
+        // Navigate after animation
+        setTimeout(() => {
+          window.location.href = this.parentElement.href;
+        }, 800);
+      });
+    });
+
+    // Add hover sound effect (optional)
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        // You can add sound effects here if needed
+        this.style.transform = 'translateY(-10px) scale(1.02)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+      });
+    });
+
+    // Animate stats on scroll (if visible)
+    function animateStats() {
+      const statNumbers = document.querySelectorAll('.stat-number');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            const finalValue = target.textContent;
+            let currentValue = 0;
+            const increment = finalValue.includes('ETH') ? 10 : 
+                            finalValue.includes('%') ? 1 : 100;
+            
+            const timer = setInterval(() => {
+              if (finalValue.includes('ETH')) {
+                currentValue += increment;
+                if (currentValue >= 847) {
+                  target.textContent = '847 ETH';
+                  clearInterval(timer);
+                } else {
+                  target.textContent = currentValue + ' ETH';
+                }
+              } else if (finalValue.includes('%')) {
+                currentValue += increment;
+                if (currentValue >= 98.7) {
+                  target.textContent = '98.7%';
+                  clearInterval(timer);
+                } else {
+                  target.textContent = currentValue.toFixed(1) + '%';
+                }
+              } else {
+                currentValue += increment;
+                const numericValue = parseInt(finalValue.replace(',', ''));
+                if (currentValue >= numericValue) {
+                  target.textContent = finalValue;
+                  clearInterval(timer);
+                } else {
+                  target.textContent = currentValue.toLocaleString();
+                }
+              }
+            }, 50);
+            
+            observer.unobserve(target);
+          }
+        });
+      });
+      
+      statNumbers.forEach(stat => observer.observe(stat));
+    }
+
+    // Initialize animations when page loads
+    document.addEventListener('DOMContentLoaded', animateStats);
+  </script>
+</body>
+</html>

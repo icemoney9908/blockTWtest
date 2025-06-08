@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <title>Start Minting - Create Your NFT</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem 0;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .wallet-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .connect-btn {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .connect-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    .account-display {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .upload-section, .details-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .upload-area {
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-area:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .upload-area.has-image {
+      padding: 1rem;
+      border-style: solid;
+      border-color: rgba(76, 175, 80, 0.5);
+    }
+
+    .upload-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .upload-text {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(10px);
+      font-family: inherit;
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .mint-btn {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 1.1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mint-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 15px 30px rgba(255, 107, 107, 0.3);
+    }
+
+    .mint-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .mint-btn.loading {
+      background: linear-gradient(45deg, #666, #888);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .hero-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="index.html" class="back-btn">← Back to Menu</a>
+        <h1 class="title">NFT Creator Studio</h1>
+      </div>
+      <div class="wallet-section">
+        <button id="connectBtn" class="connect-btn">🔗 Connect MetaMask</button>
+        <div id="accountDisplay" class="account-display">연결 안 됨</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2 class="hero-title">Create Your NFT</h2>
+      <p class="hero-subtitle">🎨 Upload your artwork and give it a name</p>
+    </div>
+
+    <div class="main-content">
+      <div class="upload-section">
+        <h3 class="section-title">
+          🖼️ Upload Artwork
+        </h3>
+        <div class="upload-area" id="uploadArea">
+          <div id="uploadPrompt">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Click to upload your image</div>
+            <div class="upload-hint">or drag and drop (JPG, PNG, GIF)</div>
+          </div>
+          <div id="imagePreview" class="hidden">
+            <img id="previewImg" class="preview-image" alt="Preview" />
+            <div style="margin-top: 1rem;">
+              <button type="button" onclick="changeImage()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer;">
+                🔄 Change Image
+              </button>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*" class="hidden" />
+      </div>
+
+      <div class="details-section">
+        <h3 class="section-title">
+          ✨ Basic Info
+        </h3>
+        
+        <div class="form-group">
+          <label for="titleInput" class="form-label">NFT Name *</label>
+          <input type="text" id="titleInput" class="form-input" placeholder="Enter your NFT name" />
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <button id="startMintBtn" class="mint-btn">
+            🎨 Create NFT
+          </button>
+          
+          <a href="minting.html" style="text-decoration: none;">
+            <button class="mint-btn" style="background: linear-gradient(45deg, #4CAF50, #8BC34A);">
+              ⚡ Join Live Minting Events
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app_mintstart.js"></script>
+  <script>
+    // Image upload handling
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+
+    uploadArea.addEventListener('click', () => {
+      imageInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleImageUpload(files[0]);
+      }
+    });
+
+    imageInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleImageUpload(e.target.files[0]);
+      }
+    });
+
+    function handleImageUpload(file) {
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          uploadPrompt.classList.add('hidden');
+          imagePreview.classList.remove('hidden');
+          uploadArea.classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function changeImage() {
+      imageInput.click();
+    }
+
+    // Mint button loading state
+    const startMintBtn = document.getElementById('startMintBtn');
+    const originalMintText = startMintBtn.innerHTML;
+
+    function setMintingState(isLoading) {
+      if (isLoading) {
+        startMintBtn.innerHTML = '<span class="loading-spinner"></span>Minting...';
+        startMintBtn.classList.add('loading');
+        startMintBtn.disabled = true;
+      } else {
+        startMintBtn.innerHTML = originalMintText;
+        startMintBtn.classList.remove('loading');
+        startMintBtn.disabled = false;
+      }
+    }
+
+    // Example usage (you can call this from your app_mintstart.js)
+    window.setMintingState = setMintingState;
+
+    // 기존 스크립트 섹션의 마지막에 추가
+    // app_mintstart.js의 함수들을 전역으로 노출
+    window.connectMetaMask = connectMetaMask;
+    window.startMint = startMint;
+
+    // 기존 이벤트 리스너와 중복 방지
+    if (document.getElementById("connectBtn")) {
+      document.getElementById("connectBtn").removeEventListener("click", connectMetaMask);
+    }
+    if (document.getElementById("startMintBtn")) {
+      document.getElementById("startMintBtn").removeEventListener("click", startMint);
+    }
+  </script>
+</body>
+</html>

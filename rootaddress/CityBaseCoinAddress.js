@@ -1,0 +1,1 @@
+module.exports = "0xA55CeB5F33fF066511eAa715E23c8712D9c7562a";

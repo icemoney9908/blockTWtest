@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Token Math - DeFi Hub</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <script type="module" src="app_tokenmath.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      color: white;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem 0;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .wallet-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .connect-btn {
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .connect-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+    }
+
+    .status {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .balance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .balance-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .balance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .balance-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.8;
+    }
+
+    .balance-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+
+    .refresh-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 1rem auto;
+      display: block;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .tabs {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      opacity: 1;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .staking-info {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-label {
+      opacity: 0.7;
+    }
+
+    .info-value {
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .balance-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .tab-buttons {
+        flex-direction: column;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="index.html" class="back-btn">← Back to Menu</a>
+        <h1 class="title">De-fi Hub</h1>
+      </div>
+      <div class="wallet-section">
+        <button id="connectBtn" class="connect-btn">🔗 Connect MetaMask</button>
+        <div id="status" class="status">Not connected</div>
+      </div>
+    </div>
+
+    <div class="balance-grid">
+      <div class="balance-card">
+        <div class="balance-title">💎 MainCoin</div>
+        <div class="balance-amount" id="mainCoinBalance">0</div>
+        <div class="balance-label">Available Balance</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-title">🔮 SubCoin</div>
+        <div class="balance-amount" id="subCoinBalance">0</div>
+        <div class="balance-label">Available Balance</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-title">🏙️ CityBaseCoin</div>
+        <div class="balance-amount" id="cbCoinBalance">0</div>
+        <div class="balance-label">Available Balance</div>
+      </div>
+    </div>
+
+    <button id="refreshBalancesBtn" class="refresh-btn">🔄 Refresh Balances</button>
+
+    <div class="tabs">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="showTab('send')">📤 Send Tokens</button>
+        <button class="tab-btn" onclick="showTab('swap')">🔄 Token Swap</button>
+        <button class="tab-btn" onclick="showTab('stake')">📈 Staking</button>
+      </div>
+
+      <div id="send" class="tab-content active">
+        <h3 style="margin-bottom: 1rem;">Send Tokens</h3>
+        <div class="form-group">
+          <label class="form-label">Select Token</label>
+          <select id="tokenchoice" class="form-select">
+            <option value="MainCoin">💎 MainCoin</option>
+            <option value="SubCoin">🔮 SubCoin</option>
+            <option value="CityBaseCoin">🏙️ CityBaseCoin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recipient Address</label>
+          <input type="text" id="recipient" placeholder="0x..." class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount to Send</label>
+          <input type="text" id="sendAmount" placeholder="0.00" class="form-input" />
+        </div>
+        <button id="sendBtn" class="action-btn">🚀 Send Tokens</button>
+      </div>
+
+      <div id="swap" class="tab-content">
+        <h3 style="margin-bottom: 1rem;">Token Swap</h3>
+        <div class="form-group">
+          <label class="form-label">Swap Direction</label>
+          <select id="swapDirection" class="form-select">
+            <option value="MainToSub">💎 MainCoin → 🔮 SubCoin</option>
+            <option value="CBToSub">🏙️ CityBaseCoin → 🔮 SubCoin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount to Swap</label>
+          <input type="text" id="swapAmount" placeholder="0.00" class="form-input" />
+        </div>
+        <button id="swapButton" class="action-btn">⚡ Execute Swap</button>
+      </div>
+
+      <div id="stake" class="tab-content">
+        <h3 style="margin-bottom: 1rem;">SubCoin Staking</h3>
+        <div class="form-group">
+          <label class="form-label">Select Token</label>
+          <select id="tokenSelect" class="form-select">
+            <option value="SubCoin">🔮 SubCoin</option>
+          </select>
+        </div>
+        
+        <div class="staking-info">
+          <div id="stakedDisplay" class="info-row">
+            <span class="info-label">Staked Balance:</span>
+            <span class="info-value">0 SubCoin</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Stake Amount</label>
+            <input type="number" id="stakeAmount" placeholder="0.00" class="form-input" />
+            <button id="stakeButton" class="action-btn">📈 Stake</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Withdraw Amount</label>
+            <input type="number" id="withdrawAmount" placeholder="0.00" class="form-input" />
+            <button id="withdrawButton" class="action-btn">💰 Withdraw</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button id="estimateRewardButton" class="action-btn">🎯 Estimate Reward</button>
+          <button id="exitButton" class="action-btn">🚪 Exit (Withdraw All + Reward)</button>
+        </div>
+        
+        <div id="rewardDisplay" class="staking-info" style="margin-top: 1rem; text-align: center;">
+          <span class="info-label">Estimated Rewards: </span>
+          <span class="info-value">Calculate to see rewards</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabName) {
+      // Hide all tab contents
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+      
+      // Remove active class from all buttons
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      // Show selected tab and activate button
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // 기존 showTab 함수 아래에 추가
+    // Web3 및 컨트랙트 변수들을 전역으로 선언
+    window.web3 = null;
+    window.accounts = null;
+    window.mainCoinContract = null;
+    window.subCoinContract = null;
+    window.CBCoinContract = null;
+    window.tokenSwapContract = null;
+    window.stakingContract = null;
+
+    // app_tokenmath.js의 함수들을 사용할 수 있도록 연결
+    window.connectMetaMask = connectMetaMask;
+    window.updateBalances = updateBalances;
+    window.sendToken = sendToken;
+    window.handleSwap = handleSwap;
+    window.stakeTokens = stakeTokens;
+    window.withdrawTokens = withdrawTokens;
+    window.estimateRewardcode = estimateRewardcode;
+    window.exitStake = exitStake;
+  </script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <title>Join Minting - Community Events</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+      min-height: 100vh;
+      color: white;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem 0;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .wallet-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .connect-btn {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .connect-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .account-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.8rem 1rem;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+    }
+
+    /* Balance Section */
+    .balance-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .balance-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .balance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .balance-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+
+    .balance-amount {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    /* Minting Cards */
+    .minting-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .mint-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mint-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .countdown {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff6666;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .contribute-btn {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .contribute-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .contribute-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Approve Section */
+    .approve-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    .approve-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .approve-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .approve-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: end;
+    }
+
+    .approve-btn {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .approve-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .minting-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-row, .balance-grid, .approve-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="index.html" class="back-btn">← Back to Menu</a>
+        <h1 class="title">Community Minting</h1>
+      </div>
+      <div class="wallet-section">
+        <button id="connectBtn" class="connect-btn">🔗 Connect MetaMask</button>
+        <div id="account" class="account-info">
+          Account: Not connected
+        </div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h2 class="hero-title">Live Minting Events</h2>
+      <p class="hero-subtitle">⚡ Join the community and support amazing creators</p>
+    </div>
+
+    <!-- User Balance Section -->
+    <div class="balance-section">
+      <h3 class="balance-title">💰 Your Balance</h3>
+      <div class="balance-grid">
+        <div class="balance-item">
+          <div class="balance-label">MainCoin</div>
+          <div class="balance-amount" id="mainBalance">0</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">SubCoin</div>
+          <div class="balance-amount" id="subBalance">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approve Section - 이 부분을 위로 이동 -->
+    <div class="approve-section">
+      <h3 class="approve-title">🔐 Approve Tokens</h3>
+      <div class="approve-grid">
+        <div>
+          <div class="form-group">
+            <label class="form-label">MainCoin Approve Amount:</label>
+            <div class="approve-item">
+              <input type="text" id="approveMainAmount" placeholder="Amount in ETH" class="form-input" />
+              <button id="approveMainBtn" class="approve-btn">Approve</button>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="form-group">
+            <label class="form-label">SubCoin Approve Amount:</label>
+            <div class="approve-item">
+              <input type="text" id="approveSubAmount" placeholder="Amount in ETH" class="form-input" />
+              <button id="approveSubBtn" class="approve-btn">Approve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minting Cards Container -->
+    <div id="mintingList" class="minting-grid">
+      <!-- Cards will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Load JavaScript -->
+  <script type="module" src="./app_minting.js"></script>
+  
+  <script>
+    // Function to format time
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Function to create simplified minting cards
+    function createMintingCard(project, index) {
+      return `
+        <div class="mint-card">
+          <img src="${project.image}" alt="${project.name}" class="card-image" />
+          
+          <div class="card-content">
+            <h4 class="card-title">${project.name}</h4>
+            
+            <div class="countdown" id="countdown-${index}">
+              ⏰ 계산 중...
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">기여할 NFT 이름:</label>
+              <input type="text" id="nftNameInput-${index}" placeholder="${project.name}" class="form-input" />
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">MainCoin Amount</label>
+                <input type="text" id="mainAmount-${index}" placeholder="0.00" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">SubCoin Amount</label>
+                <input type="text" id="subAmount-${index}" placeholder="0.00" class="form-input" />
+              </div>
+            </div>
+            
+            <button onclick="contribute(${index})" class="contribute-btn">
+              ⚡ Contribute Now
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Function to handle contribution with index support
+    async function contribute(index = 0) {
+      try {
+        const mainAmount = document.getElementById(`mainAmount-${index}`);
+        const subAmount = document.getElementById(`subAmount-${index}`);
+        const nftName = document.getElementById(`nftNameInput-${index}`);
+
+        const mainAmountValue = mainAmount ? mainAmount.value : "";
+        const subAmountValue = subAmount ? subAmount.value : "";
+        const nftNameValue = nftName ? nftName.value.trim() : "";
+
+        if (!mainAmountValue && !subAmountValue) return alert("Enter at least one amount");
+        if (!nftNameValue) return alert("NFT 이름을 입력하세요");
+
+        // app_minting.js의 함수 호출
+        if (window.handleContribute) {
+          await window.handleContribute(index, mainAmountValue, subAmountValue, nftNameValue);
+          
+          // Clear inputs on success
+          if (mainAmount) mainAmount.value = "";
+          if (subAmount) subAmount.value = "";
+          if (nftName) nftName.value = "";
+        } else {
+          alert("Web3 connection not ready. Please refresh the page.");
+        }
+        
+      } catch (error) {
+        console.error("Contribution error:", error);
+        alert("Contribution failed: " + (error.message || error));
+      }
+    }
+
+    // Make contribute function global
+    window.contribute = contribute;
+
+    // Load mint list and integrate with existing HTML structure
+    async function loadMintList() {
+      try {
+        const res = await axios.get("http://localhost:3000/mintinfo-list");
+        const list = res.data;
+
+        const mintingGrid = document.getElementById('mintingList');
+        if (!mintingGrid) return;
+
+        // Clear existing content
+        mintingGrid.innerHTML = '';
+
+        for (let i = 0; i < list.length; i++) {
+          const file = list[i];
+          const { data } = await axios.get(`http://localhost:3000/mintinfo/${file}`);
+
+          const cardHTML = createMintingCard(data, i);
+          mintingGrid.innerHTML += cardHTML;
+
+          // Start countdown for this card
+          startCountdown(data.mintStartTime, `countdown-${i}`);
+        }
+      } catch (err) {
+        console.error("Failed to load mint info:", err);
+        // Show sample data if server is not available
+        showSampleData();
+      }
+    }
+
+    // Show sample data for demonstration
+    function showSampleData() {
+      const sampleData = [
+        {
+          name: "Cosmic Dreams",
+          image: "/placeholder.svg?height=200&width=350",
+          mintStartTime: Date.now() - 30000 // 30 seconds ago
+        },
+        {
+          name: "Digital Landscapes", 
+          image: "/placeholder.svg?height=200&width=350",
+          mintStartTime: Date.now() - 10000 // 10 seconds ago
+        }
+      ];
+
+      const mintingGrid = document.getElementById('mintingList');
+      sampleData.forEach((project, index) => {
+        mintingGrid.innerHTML += createMintingCard(project, index);
+        startCountdown(project.mintStartTime, `countdown-${index}`);
+      });
+    }
+
+    // Countdown function
+    function startCountdown(startTimestamp, elementId) {
+      const interval = setInterval(() => {
+        const now = Date.now() / 1000;
+        const end = startTimestamp / 1000 + 60;
+        const remaining = Math.max(0, end - now);
+
+        const el = document.getElementById(elementId);
+        if (!el) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (remaining > 0) {
+          el.innerHTML = `⏰ 남은 시간: ${Math.floor(remaining)}초`;
+        } else {
+          el.innerHTML = `⏰ 제한시간 만료 ⏰`;
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    // Initialize page when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Try to load real data, fallback to sample data
+      loadMintList();
+    });
+
+    // Update account display when wallet connects
+    function updateAccountDisplay(account, balances) {
+      const accountElement = document.getElementById('account');
+      const mainBalance = document.getElementById('mainBalance');
+      const subBalance = document.getElementById('subBalance');
+      
+      if (account) {
+        accountElement.textContent = `Account: ${account.slice(0, 6)}...${account.slice(-4)}`;
+        if (balances) {
+          mainBalance.textContent = balances.mainCoin || '0';
+          subBalance.textContent = balances.subCoin || '0';
+        }
+      }
+    }
+
+    // Make function available globally for app_minting.js
+    window.updateAccountDisplay = updateAccountDisplay;
+  </script>
+</body>
+</html>
