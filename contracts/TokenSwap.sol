@@ -36,9 +36,9 @@ contract TokenSwap is Ownable {
         uint256 amountSubCoin = amountCBCoin * swapRate_CtS;
 
         // 사용자로부터 CBCoin 받기
-        require(subCoin.transferFrom(msg.sender, address(this), amountCBCoin), "CBCoin transfer failed");
+        require(citybaseCoin.transferFrom(msg.sender, address(this), amountCBCoin), "CBCoin transfer failed");
         // 사용자에게 SubCoin 주기
-        require(mainCoin.transfer(msg.sender, amountSubCoin), "SubCoin transfer failed");
+        require(subCoin.transfer(msg.sender, amountSubCoin), "SubCoin transfer failed");
     }
 
     /* owner가 컨트랙트에 토큰 입금 (스왑용)

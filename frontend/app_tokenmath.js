@@ -232,7 +232,7 @@ async function withdrawTokens(tokenName, amount) {
   }
 
   try {
-    await stakingContract.methods.withdraw(tokenAddress, amountWei).send({ from: accounts[0] });
+    await stakingContract.methods.withdraw(tokenAddress, amountWei).send({ from: accounts[0], gas: 1000000 });
     checkStakedBalance(tokenName)
     updateBalances();
     alert(`${tokenName} withdraw successful!`);
