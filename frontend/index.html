@@ -11,28 +11,34 @@
       box-sizing: border-box;
     }
 
+    html {
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      color: white;
       position: relative;
       overflow-x: hidden;
+      /* 스크롤바 안정화 */
+      width: 100%;
     }
 
-    /* Animated background */
+    /* Animated background - 스크롤에 영향 없도록 수정 */
     body::before {
       content: '';
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
       background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
       animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
     }
 
     @keyframes float {
@@ -44,9 +50,15 @@
       position: relative;
       z-index: 1;
       text-align: center;
-      max-width: 1400px;
+      max-width: 1600px;
       padding: 2rem;
       width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
 
     .header {
@@ -77,14 +89,15 @@
       margin-bottom: 2rem;
     }
 
-    /* 가로 배치된 메뉴 */
+    /* 메뉴 컨테이너 - 2x2 그리드 */
     .menu-container {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
       gap: 2rem;
       margin: 2rem 0;
-      flex-wrap: wrap;
+      max-width: 1200px;
+      width: 100%;
     }
 
     .menu-card {
@@ -92,19 +105,18 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
-      padding: 2.5rem 2rem;
+      padding: 2rem;
       text-decoration: none;
       color: white;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
-      transform: translateY(0);
-      flex: 1;
-      min-width: 320px;
-      max-width: 400px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      min-height: 380px;
+      /* 호버 시 레이아웃 변경 방지 */
+      will-change: transform;
     }
 
     .menu-card::before {
@@ -116,6 +128,7 @@
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.5s;
+      pointer-events: none;
     }
 
     .menu-card:hover::before {
@@ -133,16 +146,16 @@
     }
 
     .card-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 1.5rem;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 1.2rem;
       background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      animation: pulse 2s infinite;
+      font-size: 1.8rem;
+      animation: pulse 2s ease-in-out infinite;
       position: relative;
     }
 
@@ -158,56 +171,60 @@
       background: linear-gradient(45deg, #4CAF50, #8BC34A);
     }
 
+    .card-icon.my-nft {
+      background: linear-gradient(45deg, #9C27B0, #E91E63);
+    }
+
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.05); }
     }
 
     .card-title {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .card-description {
-      font-size: 1rem;
+      font-size: 0.9rem;
       opacity: 0.8;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
     }
 
     .card-features {
       list-style: none;
       text-align: left;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .card-features li {
-      padding: 0.5rem 0;
+      padding: 0.4rem 0;
       position: relative;
-      padding-left: 2rem;
-      font-size: 0.95rem;
+      padding-left: 1.8rem;
+      font-size: 0.85rem;
     }
 
     .card-features li::before {
       content: '✨';
       position: absolute;
       left: 0;
-      top: 0.5rem;
-      font-size: 1rem;
+      top: 0.4rem;
+      font-size: 0.9rem;
     }
 
     .card-button {
       background: linear-gradient(45deg, #667eea, #764ba2);
       border: none;
-      padding: 1rem 2rem;
+      padding: 0.9rem 1.8rem;
       border-radius: 25px;
       color: white;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
       width: 100%;
-      font-size: 1.1rem;
+      font-size: 1rem;
       position: relative;
       overflow: hidden;
       margin-top: auto;
@@ -225,6 +242,10 @@
       background: linear-gradient(45deg, #4CAF50, #8BC34A);
     }
 
+    .card-button.my-nft-btn {
+      background: linear-gradient(45deg, #9C27B0, #E91E63);
+    }
+
     .card-button:hover {
       transform: scale(1.05);
       box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
@@ -239,6 +260,7 @@
       height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
       transition: left 0.5s;
+      pointer-events: none;
     }
 
     .card-button:hover::before {
@@ -253,6 +275,8 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
       padding: 2rem;
+      width: 100%;
+      max-width: 1200px;
     }
 
     .stats-title {
@@ -299,15 +323,25 @@
     }
 
     /* Responsive Design */
-    @media (max-width: 1200px) {
+    @media (max-width: 1024px) {
       .menu-container {
-        flex-direction: column;
-        align-items: center;
+        max-width: 800px;
+        gap: 1.5rem;
       }
       
       .menu-card {
-        max-width: 500px;
-        width: 100%;
+        min-height: 350px;
+        padding: 1.8rem;
+      }
+      
+      .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.6rem;
+      }
+      
+      .card-title {
+        font-size: 1.4rem;
       }
     }
 
@@ -320,19 +354,26 @@
         padding: 1rem;
       }
       
+      .menu-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 1fr);
+        gap: 1.5rem;
+        max-width: 400px;
+      }
+      
       .menu-card {
-        min-width: 280px;
-        padding: 2rem 1.5rem;
+        min-height: 320px;
+        padding: 1.5rem;
       }
       
       .card-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
       }
       
       .card-title {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
       }
       
       .stats-grid {
@@ -345,20 +386,25 @@
       .stats-grid {
         grid-template-columns: 1fr;
       }
+      
+      .menu-container {
+        max-width: 320px;
+      }
     }
 
-    /* Floating particles */
+    /* Floating particles - 스크롤에 영향 없도록 수정 */
     .particle {
-      position: absolute;
+      position: fixed;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 50%;
       pointer-events: none;
       animation: floatUp 6s infinite linear;
+      z-index: 0;
     }
 
     @keyframes floatUp {
       0% {
-        opacity: 1;
+        opacity: 0;
         transform: translateY(100vh) scale(0);
       }
       10% {
@@ -406,7 +452,7 @@
       <p class="subtitle">🚀 Next-Generation NFT Platform</p>
     </div>
 
-    <!-- 가로로 배치된 메뉴 카드들 -->
+    <!-- 2x2 그리드로 배치된 메뉴 카드들 -->
     <div class="menu-container">
       <a href="tokenmath.html" class="menu-card">
         <div class="card-content">
@@ -458,6 +504,23 @@
           🌟 Join Community
         </button>
       </a>
+
+      <a href="mynft.html" class="menu-card">
+        <div class="card-content">
+          <div class="card-icon my-nft">🖼️</div>
+          <h3 class="card-title">My Collection</h3>
+          <p class="card-description">View and manage your personal NFT portfolio and collection history</p>
+          <ul class="card-features">
+            <li>Created NFTs Gallery</li>
+            <li>Contributed NFTs History</li>
+            <li>Portfolio Statistics</li>
+            <li>Collection Management</li>
+          </ul>
+        </div>
+        <button class="card-button my-nft-btn">
+          📁 View Portfolio
+        </button>
+      </a>
     </div>
 
     <!-- Stats Section -->
@@ -485,44 +548,51 @@
   </div>
 
   <script>
-    // Create floating particles
+    // 스크롤바 안정화를 위한 개선된 파티클 시스템
+    let particleCount = 0;
+    const maxParticles = 10; // 최대 파티클 수 제한
+
     function createParticle() {
+      if (particleCount >= maxParticles) return;
+
       const particle = document.createElement('div');
       particle.className = 'particle';
       particle.style.left = Math.random() * 100 + 'vw';
-      particle.style.width = particle.style.height = Math.random() * 10 + 5 + 'px';
-      particle.style.animationDelay = Math.random() * 6 + 's';
+      particle.style.width = particle.style.height = Math.random() * 8 + 4 + 'px';
+      particle.style.animationDelay = Math.random() * 2 + 's';
+      
       document.body.appendChild(particle);
+      particleCount++;
 
+      // 애니메이션 완료 후 제거
       setTimeout(() => {
-        particle.remove();
+        if (particle.parentNode) {
+          particle.remove();
+          particleCount--;
+        }
       }, 6000);
     }
 
-    // Create particles periodically
-    setInterval(createParticle, 300);
+    // 파티클 생성 간격 증가 (성능 개선)
+    setInterval(createParticle, 800);
 
-    // Add click animation to buttons
+    // 버튼 클릭 애니메이션 개선
     document.querySelectorAll('.card-button').forEach(button => {
       button.addEventListener('click', function(e) {
-        // Prevent default link behavior temporarily
         e.preventDefault();
         
-        // Add loading animation
         this.classList.add('loading');
         this.style.pointerEvents = 'none';
         
-        // Navigate after animation
         setTimeout(() => {
           window.location.href = this.parentElement.href;
-        }, 800);
+        }, 600);
       });
     });
 
-    // Add hover sound effect (optional)
+    // 호버 효과 최적화
     document.querySelectorAll('.menu-card').forEach(card => {
       card.addEventListener('mouseenter', function() {
-        // You can add sound effects here if needed
         this.style.transform = 'translateY(-10px) scale(1.02)';
       });
       
@@ -531,7 +601,7 @@
       });
     });
 
-    // Animate stats on scroll (if visible)
+    // 통계 애니메이션 최적화
     function animateStats() {
       const statNumbers = document.querySelectorAll('.stat-number');
       const observer = new IntersectionObserver((entries) => {
@@ -540,8 +610,8 @@
             const target = entry.target;
             const finalValue = target.textContent;
             let currentValue = 0;
-            const increment = finalValue.includes('ETH') ? 10 : 
-                            finalValue.includes('%') ? 1 : 100;
+            const increment = finalValue.includes('ETH') ? 15 : 
+                            finalValue.includes('%') ? 2 : 150;
             
             const timer = setInterval(() => {
               if (finalValue.includes('ETH')) {
@@ -570,7 +640,7 @@
                   target.textContent = currentValue.toLocaleString();
                 }
               }
-            }, 50);
+            }, 30);
             
             observer.unobserve(target);
           }
@@ -580,7 +650,7 @@
       statNumbers.forEach(stat => observer.observe(stat));
     }
 
-    // Initialize animations when page loads
+    // 페이지 로드 완료 후 애니메이션 시작
     document.addEventListener('DOMContentLoaded', animateStats);
   </script>
 </body>

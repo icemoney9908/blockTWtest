@@ -30,6 +30,6 @@ contract CityBaseNFT is ERC721URIStorage, Ownable {
         _setTokenURI(newTokenId, tokenURI);
 
         nftContributors[newTokenId] = contributors;
-        //totalContributionScore[newTokenId] = totalScore;
+        //totalContributionScore = totalScore;
     }
 }

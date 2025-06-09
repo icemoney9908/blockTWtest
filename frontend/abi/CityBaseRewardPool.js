@@ -32,6 +32,12 @@ export const CityBaseRewardPoolABI = [
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "mainAmount",
         "type": "uint256"
@@ -45,7 +51,7 @@ export const CityBaseRewardPoolABI = [
     ],
     "name": "Contributed",
     "type": "event",
-    "signature": "0xfa35a310d7113dddce1c275da946348e9aaebf9050b00b372033c4d84b0bd6eb"
+    "signature": "0xb00552cf2ce0f4499bc88c0bc78fc1bbd5ec160198aa7d45f5c1e2ef16eb3902"
   },
   {
     "anonymous": false,
@@ -78,6 +84,12 @@ export const CityBaseRewardPoolABI = [
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "mainAmount",
         "type": "uint256"
@@ -91,7 +103,7 @@ export const CityBaseRewardPoolABI = [
     ],
     "name": "Refunded",
     "type": "event",
-    "signature": "0x2dc8e290002f06fc0085bbca9dfb8b415cf4d1178950c72ff9ee8f4d8878ee66"
+    "signature": "0x0e0502582d0bdaa960aad296ea773e4b7919a8ff7d61871cf7d1fcba18b8ab18"
   },
   {
     "anonymous": false,
@@ -104,6 +116,12 @@ export const CityBaseRewardPoolABI = [
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "rewardAmount",
         "type": "uint256"
@@ -111,7 +129,7 @@ export const CityBaseRewardPoolABI = [
     ],
     "name": "RewardClaimed",
     "type": "event",
-    "signature": "0x106f923f993c2149d49b4255ff723acafa1f2d94393f561d3eda32ae348f7241"
+    "signature": "0xa22c130ab9525575739c5b8856b4345b50ef04582844399f49949042eb410f00"
   },
   {
     "inputs": [],
@@ -134,6 +152,11 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
     "name": "contributedMain",
@@ -147,7 +170,7 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x290f7aa4"
+    "signature": "0x52b1b53f"
   },
   {
     "inputs": [
@@ -155,6 +178,11 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
     "name": "contributedSub",
@@ -168,7 +196,7 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x57d55e94"
+    "signature": "0xadab3025"
   },
   {
     "inputs": [
@@ -176,6 +204,11 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
     "name": "hasMinted",
@@ -189,7 +222,7 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x38e21cce"
+    "signature": "0x6f83ae5f"
   },
   {
     "inputs": [],
@@ -260,7 +293,13 @@ export const CityBaseRewardPoolABI = [
     "signature": "0x6a8dac93"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "name": "totalMainContributed",
     "outputs": [
       {
@@ -272,10 +311,16 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x73686161"
+    "signature": "0x91b48993"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "name": "totalSubContributed",
     "outputs": [
       {
@@ -287,7 +332,7 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x355b5da7"
+    "signature": "0xb96f7ba0"
   },
   {
     "inputs": [
@@ -306,6 +351,11 @@ export const CityBaseRewardPoolABI = [
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "mainAmount",
         "type": "uint256"
@@ -320,7 +370,7 @@ export const CityBaseRewardPoolABI = [
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "signature": "0x8c590917"
+    "signature": "0x64f745a7"
   },
   {
     "inputs": [
@@ -328,6 +378,11 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address",
         "name": "user",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
       }
     ],
     "name": "getUserContributionScore",
@@ -341,7 +396,7 @@ export const CityBaseRewardPoolABI = [
     "stateMutability": "view",
     "type": "function",
     "constant": true,
-    "signature": "0x33b3b52a"
+    "signature": "0x8a18c164"
   },
   {
     "inputs": [
@@ -351,16 +406,16 @@ export const CityBaseRewardPoolABI = [
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "userScore",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
       }
     ],
     "name": "claimReward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "signature": "0x174e31c4"
+    "signature": "0x3e6a569a"
   },
   {
     "inputs": [
@@ -368,13 +423,18 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address",
         "name": "user",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
       }
     ],
     "name": "refund",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "signature": "0xfa89401a"
+    "signature": "0xe08d722e"
   },
   {
     "inputs": [
@@ -382,12 +442,17 @@ export const CityBaseRewardPoolABI = [
         "internalType": "address[]",
         "name": "contributors",
         "type": "address[]"
+      },
+      {
+        "internalType": "string",
+        "name": "nftName",
+        "type": "string"
       }
     ],
     "name": "refundAll",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "signature": "0x6d2e65da"
+    "signature": "0xb45a092f"
   }
 ];

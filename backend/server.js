@@ -7,6 +7,8 @@ import { create } from 'ipfs-http-client';
 import { fileURLToPath } from 'url';
 
 import Web3 from 'web3';
+import { MainCoinABI } from './abi/MainCoin.js';
+import { MainCoinAddress } from './backaddress/MainCoinAddress.js';
 import { CityBaseNFTABI } from './abi/CityBaseNFT.js';
 import { CityBaseNFTAddress } from './backaddress/CityBaseNFTAddress.js';
 import { CityBaseRewardPoolABI } from './abi/CityBaseRewardPool.js';
@@ -14,6 +16,7 @@ import { CityBaseRewardPoolAddress } from './backaddress/CityBaseRewardPoolAddre
 
 
 const web3 = new Web3("http://127.0.0.1:7545"); // 또는 실제 provider 주소
+const maincoin = new web3.eth.Contract(MainCoinABI, MainCoinAddress);
 const rewardPool = new web3.eth.Contract(CityBaseRewardPoolABI, CityBaseRewardPoolAddress);
 const nftContract = new web3.eth.Contract(CityBaseNFTABI, CityBaseNFTAddress);
 const serverOwner = '0x3F444E2a9Cd80824ac55b3A1638ACd2ec62140Bc'; // ganache나 owner 계정
@@ -36,6 +39,8 @@ const ipfs = create({ url: 'http://127.0.0.1:5001' });
 const mintInfoDir = path.join(__dirname, 'mintinfo');
 // contributeinfo 폴더 경로
 const contributeInfoDir = path.join(__dirname, 'contributeinfo');
+// mintedNFT 폴더 경로
+const mintedNFTDir = path.join(__dirname, '..', 'frontend', 'mintedNFT');
 
 // 폴더 없으면 생성
 if (!fs.existsSync(mintInfoDir)) {
@@ -197,6 +202,24 @@ app.post('/upload-ipfs', async (req, res) => {
   }
 });
 
+//발행된 NFT 기록 저장
+function saveMintedNFT(nftName, creator, imageURL, contributors) {
+  if (!fs.existsSync(mintedNFTDir)) {
+    fs.mkdirSync(mintedNFTDir, { recursive: true });
+  }
+
+  const data = {
+    name: nftName,
+    image: imageURL,
+    creator: creator,
+    contributors: contributors
+  };
+
+  const filePath = path.join(mintedNFTDir, `${nftName}.json`);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+}
+
+
 // 자동 민팅/보상 체크 함수
 setInterval(async () => {
   const now = Date.now();
@@ -227,13 +250,14 @@ setInterval(async () => {
 
       const contribdata = JSON.parse(fs.readFileSync(contribPath, 'utf8'));
       const contributors = contribdata.contributors;
+      const nftNameHash = web3.utils.keccak256(nftName);
 
       let totalScore = 0;
 
       // 1. 민팅 가능한지 확인
       try {
         for (let i = 0; i < contributors.length; i++) {
-          const score = await rewardPool.methods.getUserContributionScore(contributors[i]).call();
+          const score = await rewardPool.methods.getUserContributionScore(contributors[i], nftNameHash).call();
           totalScore += Number(score);
         }
         const readableScore = Number(totalScore) / 1e18;
@@ -250,8 +274,11 @@ setInterval(async () => {
         // 2. 민팅 실행
         await nftContract.methods.mint(imageURL, contributors).send({ from: creator, gas: 5000000 });
         console.log(`✅ NFT 민팅 완료: ${nftName} → ${creator}`);
+        await saveMintedNFT(nftName, creator, imageURL, contributors);
+        //console.log(`✅ Minted NFT 정보가 저장되었습니다: ${filePath}`);
 
         // 3. 보상 지급
+        await maincoin.methods.mint(creator, web3.utils.toWei("10", "ether")).send({ from: serverOwner, gas: 5000000 });
         await handleReward(nftName);
         cleanUpFiles(nftName);
       } catch (err) {
@@ -271,17 +298,15 @@ async function handleReward(nftName) {
 
   const data = JSON.parse(fs.readFileSync(contribPath, 'utf8'));
   const contributors = data.contributors;
+  const nftNameHash = web3.utils.keccak256(nftName);
   for (let i = 0; i < contributors.length; i++) {
     try {
-      const userScore = await rewardPool.methods.getUserContributionScore(contributors[i]).call();
-      await rewardPool.methods.claimReward(contributors[i], userScore).send({ from: serverOwner, gas: 10000000 });
+      await rewardPool.methods.claimReward(contributors[i], nftNameHash).send({ from: serverOwner, gas: 10000000 });
       console.log(`🎁 보상 지급 완료 ${contributors[i]}`);
     } catch (e) {
       console.error(`❌ 보상 지급 실패`, e.message);
     }
   }
-
-  
 }
 
 // 환불 함수 (민팅 실패 시)
@@ -291,10 +316,11 @@ async function handleRefund(nftName) {
 
   const data = JSON.parse(fs.readFileSync(contribPath, 'utf8'));
   const contributors = data.contributors;
+  const nftNameHash = web3.utils.keccak256(nftName);
 
   
   try {
-    await rewardPool.methods.refundAll(contributors).send({ from: serverOwner });
+    await rewardPool.methods.refundAll(contributors, nftNameHash).send({ from: serverOwner, gas: 10000000 });
     console.log(`↩️ 환불 완료`);
   } catch (e) {
     console.error(`❌ 환불 실패`, e.message);

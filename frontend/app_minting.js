@@ -115,9 +115,10 @@ window.handleContribute = async (index, mainAmountValue, subAmountValue, nftName
 
     const mainAmt = mainAmountValue.trim() === "" ? "0" : mainAmountValue.trim()
     const subAmt = subAmountValue.trim() === "" ? "0" : subAmountValue.trim()
+    const nftNameHash = web3.utils.keccak256(nftNameValue);
 
     // 1. 스마트 컨트랙트에 기여 전송
-    await rewardPool.methods.contribute(web3.utils.toWei(mainAmt), web3.utils.toWei(subAmt)).send({ from: account })
+    await rewardPool.methods.contribute(nftNameHash, web3.utils.toWei(mainAmt), web3.utils.toWei(subAmt)).send({ from: account })
 
     // 2. 서버에 기여 정보 전송 (CDN axios 사용)
     await window.axios.post("http://localhost:3000/save-contributeinfo", {
@@ -148,7 +149,9 @@ async function loadMintList() {
     // Clear existing content
     mintingGrid.innerHTML = ""
 
-    for (let i = 0; i < list.length; i++) {
+    // 2개만 로드하도록 수정
+    const maxItems = Math.min(2, list.length)
+    for (let i = 0; i < maxItems; i++) {
       const file = list[i]
       const { data } = await window.axios.get(`http://localhost:3000/mintinfo/${file}`)
 

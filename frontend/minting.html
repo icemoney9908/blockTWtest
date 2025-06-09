@@ -178,7 +178,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
       gap: 2rem;
-      margin-bottom: 2rem;
+      margin-bottom: 3rem;
     }
 
     .mint-card {
@@ -188,11 +188,17 @@
       border-radius: 20px;
       overflow: hidden;
       transition: all 0.3s ease;
+      cursor: pointer;
     }
 
     .mint-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .mint-card.selected {
+      border: 2px solid #4CAF50;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
     }
 
     .card-image {
@@ -219,12 +225,60 @@
       border-radius: 10px;
       text-align: center;
       font-weight: 600;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-description {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Combined Action Section */
+    .action-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .action-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .selected-nft {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid rgba(76, 175, 80, 0.5);
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .selected-nft-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .selected-nft-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.8;
     }
 
     /* Form Styles */
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .form-label {
@@ -254,7 +308,14 @@
       gap: 1rem;
     }
 
-    .contribute-btn {
+    .approve-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .action-btn {
       background: linear-gradient(45deg, #4CAF50, #8BC34A);
       border: none;
       color: white;
@@ -267,46 +328,18 @@
       margin-top: 1rem;
     }
 
-    .contribute-btn:hover {
+    .action-btn:hover {
       transform: scale(1.02);
       box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
     }
 
-    .contribute-btn:disabled {
+    .action-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    /* Approve Section */
-    .approve-section {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 2rem;
-    }
-
-    .approve-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    .approve-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .approve-item {
-      display: flex;
-      gap: 0.5rem;
-      align-items: end;
-    }
-
     .approve-btn {
-      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      background: linear-gradient(45deg, #FF9800, #FFC107);
       border: none;
       color: white;
       padding: 0.8rem 1.5rem;
@@ -330,7 +363,7 @@
         grid-template-columns: 1fr;
       }
       
-      .form-row, .balance-grid, .approve-grid {
+      .form-row, .balance-grid, .approve-row {
         grid-template-columns: 1fr;
       }
       
@@ -357,7 +390,7 @@
 
     <div class="hero">
       <h2 class="hero-title">Live Minting Events</h2>
-      <p class="hero-subtitle">⚡ Join the community and support amazing creators</p>
+      <p class="hero-subtitle">⚡ 최대 2개의 민팅 이벤트만 표시됩니다</p>
     </div>
 
     <!-- User Balance Section -->
@@ -375,35 +408,100 @@
       </div>
     </div>
 
-    <!-- Approve Section - 이 부분을 위로 이동 -->
-    <div class="approve-section">
-      <h3 class="approve-title">🔐 Approve Tokens</h3>
-      <div class="approve-grid">
-        <div>
-          <div class="form-group">
+    <!-- NFT Cards Container - 위로 이동 -->
+    <div id="mintingList" class="minting-grid">
+      <!-- 첫 번째 카드 -->
+      <div class="mint-card" onclick="selectNFT(0, 'Cosmic Dreams')" id="card-0">
+        <img src="/placeholder.svg?height=200&width=350" alt="Cosmic Dreams" class="card-image" />
+        
+        <div class="card-content">
+          <h4 class="card-title">Cosmic Dreams</h4>
+          
+          <div class="countdown" id="countdown-0">
+            ⏰ 남은 시간: 30초
+          </div>
+          
+          <div class="card-description">
+            우주의 신비로운 꿈을 담은 디지털 아트 컬렉션
+          </div>
+        </div>
+      </div>
+
+      <!-- 두 번째 카드 -->
+      <div class="mint-card" onclick="selectNFT(1, 'Digital Landscapes')" id="card-1">
+        <img src="/placeholder.svg?height=200&width=350" alt="Digital Landscapes" class="card-image" />
+        
+        <div class="card-content">
+          <h4 class="card-title">Digital Landscapes</h4>
+          
+          <div class="countdown" id="countdown-1">
+            ⏰ 남은 시간: 10초
+          </div>
+          
+          <div class="card-description">
+            자연의 아름다움을 디지털로 재해석한 풍경 시리즈
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined Action Section - Approve + Contribute -->
+    <div class="action-section">
+      <h3 class="action-title">🎯 NFT 기여 및 승인</h3>
+      
+      <!-- Selected NFT Display -->
+      <div class="selected-nft" id="selectedNFT">
+        <div class="selected-nft-title">선택된 NFT: 없음</div>
+        <div class="selected-nft-subtitle">위의 NFT 카드를 클릭하여 선택하세요</div>
+      </div>
+
+      <!-- NFT Name Input -->
+      <div class="form-group">
+        <label class="form-label">기여할 NFT 이름:</label>
+        <input type="text" id="nftNameInput" placeholder="NFT 이름을 입력하세요" class="form-input" />
+      </div>
+
+      <!-- Approve Section -->
+      <div class="form-group">
+        <label class="form-label">🔐 토큰 승인 (Approve)</label>
+        <div class="form-row">
+          <div>
             <label class="form-label">MainCoin Approve Amount:</label>
-            <div class="approve-item">
+            <div class="approve-row">
               <input type="text" id="approveMainAmount" placeholder="Amount in ETH" class="form-input" />
               <button id="approveMainBtn" class="approve-btn">Approve</button>
             </div>
           </div>
-        </div>
-        
-        <div>
-          <div class="form-group">
+          
+          <div>
             <label class="form-label">SubCoin Approve Amount:</label>
-            <div class="approve-item">
+            <div class="approve-row">
               <input type="text" id="approveSubAmount" placeholder="Amount in ETH" class="form-input" />
               <button id="approveSubBtn" class="approve-btn">Approve</button>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Minting Cards Container -->
-    <div id="mintingList" class="minting-grid">
-      <!-- Cards will be populated by JavaScript -->
+      <!-- Contribute Section -->
+      <div class="form-group">
+        <label class="form-label">⚡ 기여할 토큰 수량</label>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">MainCoin Amount</label>
+            <input type="text" id="mainAmount" placeholder="0.00" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">SubCoin Amount</label>
+            <input type="text" id="subAmount" placeholder="0.00" class="form-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Contribute Button -->
+      <button onclick="contribute()" class="action-btn" id="contributeBtn" disabled>
+        ⚡ 선택된 NFT에 기여하기
+      </button>
     </div>
   </div>
 
@@ -411,6 +509,36 @@
   <script type="module" src="./app_minting.js"></script>
   
   <script>
+    let selectedNFTIndex = null;
+    let selectedNFTName = null;
+
+    // NFT 선택 함수
+    function selectNFT(index, name) {
+      // 이전 선택 해제
+      document.querySelectorAll('.mint-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // 새로운 선택
+      document.getElementById(`card-${index}`).classList.add('selected');
+      selectedNFTIndex = index;
+      selectedNFTName = name;
+
+      // 선택된 NFT 표시 업데이트
+      const selectedNFTDiv = document.getElementById('selectedNFT');
+      selectedNFTDiv.innerHTML = `
+        <div class="selected-nft-title">선택된 NFT: ${name}</div>
+        <div class="selected-nft-subtitle">이 NFT에 기여할 수 있습니다</div>
+      `;
+
+      // NFT 이름 입력란에 자동 입력
+      document.getElementById('nftNameInput').value = name;
+
+      // 기여 버튼 활성화
+      document.getElementById('contributeBtn').disabled = false;
+      document.getElementById('contributeBtn').textContent = `⚡ ${name}에 기여하기`;
+    }
+
     // Function to format time
     function formatTime(seconds) {
       const hours = Math.floor(seconds / 3600);
@@ -422,7 +550,7 @@
     // Function to create simplified minting cards
     function createMintingCard(project, index) {
       return `
-        <div class="mint-card">
+        <div class="mint-card" onclick="selectNFT(${index}, '${project.name}')" id="card-${index}">
           <img src="${project.image}" alt="${project.name}" class="card-image" />
           
           <div class="card-content">
@@ -432,36 +560,24 @@
               ⏰ 계산 중...
             </div>
             
-            <div class="form-group">
-              <label class="form-label">기여할 NFT 이름:</label>
-              <input type="text" id="nftNameInput-${index}" placeholder="${project.name}" class="form-input" />
+            <div class="card-description">
+              ${project.description || '멋진 NFT 컬렉션입니다'}
             </div>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">MainCoin Amount</label>
-                <input type="text" id="mainAmount-${index}" placeholder="0.00" class="form-input" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">SubCoin Amount</label>
-                <input type="text" id="subAmount-${index}" placeholder="0.00" class="form-input" />
-              </div>
-            </div>
-            
-            <button onclick="contribute(${index})" class="contribute-btn">
-              ⚡ Contribute Now
-            </button>
           </div>
         </div>
       `;
     }
 
-    // Function to handle contribution with index support
-    async function contribute(index = 0) {
+    // Function to handle contribution
+    async function contribute() {
       try {
-        const mainAmount = document.getElementById(`mainAmount-${index}`);
-        const subAmount = document.getElementById(`subAmount-${index}`);
-        const nftName = document.getElementById(`nftNameInput-${index}`);
+        if (selectedNFTIndex === null) {
+          return alert("NFT를 먼저 선택하세요");
+        }
+
+        const mainAmount = document.getElementById('mainAmount');
+        const subAmount = document.getElementById('subAmount');
+        const nftName = document.getElementById('nftNameInput');
 
         const mainAmountValue = mainAmount ? mainAmount.value : "";
         const subAmountValue = subAmount ? subAmount.value : "";
@@ -472,12 +588,25 @@
 
         // app_minting.js의 함수 호출
         if (window.handleContribute) {
-          await window.handleContribute(index, mainAmountValue, subAmountValue, nftNameValue);
+          await window.handleContribute(selectedNFTIndex, mainAmountValue, subAmountValue, nftNameValue);
           
           // Clear inputs on success
           if (mainAmount) mainAmount.value = "";
           if (subAmount) subAmount.value = "";
           if (nftName) nftName.value = "";
+          
+          // Reset selection
+          selectedNFTIndex = null;
+          selectedNFTName = null;
+          document.querySelectorAll('.mint-card').forEach(card => {
+            card.classList.remove('selected');
+          });
+          document.getElementById('selectedNFT').innerHTML = `
+            <div class="selected-nft-title">선택된 NFT: 없음</div>
+            <div class="selected-nft-subtitle">위의 NFT 카드를 클릭하여 선택하세요</div>
+          `;
+          document.getElementById('contributeBtn').disabled = true;
+          document.getElementById('contributeBtn').textContent = "⚡ 선택된 NFT에 기여하기";
         } else {
           alert("Web3 connection not ready. Please refresh the page.");
         }
@@ -488,75 +617,22 @@
       }
     }
 
-    // Make contribute function global
+    // Make functions global
     window.contribute = contribute;
+    window.selectNFT = selectNFT;
 
-    // Load mint list and integrate with existing HTML structure
-    async function loadMintList() {
-      try {
-        const res = await axios.get("http://localhost:3000/mintinfo-list");
-        const list = res.data;
-
-        const mintingGrid = document.getElementById('mintingList');
-        if (!mintingGrid) return;
-
-        // Clear existing content
-        mintingGrid.innerHTML = '';
-
-        for (let i = 0; i < list.length; i++) {
-          const file = list[i];
-          const { data } = await axios.get(`http://localhost:3000/mintinfo/${file}`);
-
-          const cardHTML = createMintingCard(data, i);
-          mintingGrid.innerHTML += cardHTML;
-
-          // Start countdown for this card
-          startCountdown(data.mintStartTime, `countdown-${i}`);
-        }
-      } catch (err) {
-        console.error("Failed to load mint info:", err);
-        // Show sample data if server is not available
-        showSampleData();
-      }
-    }
-
-    // Show sample data for demonstration
-    function showSampleData() {
-      const sampleData = [
-        {
-          name: "Cosmic Dreams",
-          image: "/placeholder.svg?height=200&width=350",
-          mintStartTime: Date.now() - 30000 // 30 seconds ago
-        },
-        {
-          name: "Digital Landscapes", 
-          image: "/placeholder.svg?height=200&width=350",
-          mintStartTime: Date.now() - 10000 // 10 seconds ago
-        }
-      ];
-
-      const mintingGrid = document.getElementById('mintingList');
-      sampleData.forEach((project, index) => {
-        mintingGrid.innerHTML += createMintingCard(project, index);
-        startCountdown(project.mintStartTime, `countdown-${index}`);
-      });
-    }
-
-    // Countdown function
-    function startCountdown(startTimestamp, elementId) {
+    // 카운트다운 시작
+    function startCountdown(elementId, seconds) {
       const interval = setInterval(() => {
-        const now = Date.now() / 1000;
-        const end = startTimestamp / 1000 + 60;
-        const remaining = Math.max(0, end - now);
-
+        seconds--;
         const el = document.getElementById(elementId);
         if (!el) {
           clearInterval(interval);
           return;
         }
 
-        if (remaining > 0) {
-          el.innerHTML = `⏰ 남은 시간: ${Math.floor(remaining)}초`;
+        if (seconds > 0) {
+          el.innerHTML = `⏰ 남은 시간: ${seconds}초`;
         } else {
           el.innerHTML = `⏰ 제한시간 만료 ⏰`;
           clearInterval(interval);
@@ -564,10 +640,10 @@
       }, 1000);
     }
 
-    // Initialize page when DOM is loaded
+    // 페이지 로드 시 카운트다운 시작
     document.addEventListener('DOMContentLoaded', () => {
-      // Try to load real data, fallback to sample data
-      loadMintList();
+      startCountdown('countdown-0', 30);
+      startCountdown('countdown-1', 10);
     });
 
     // Update account display when wallet connects
